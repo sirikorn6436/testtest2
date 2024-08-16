@@ -17,11 +17,18 @@
     margin-bottom: 20px;
   }
 
-
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px;
+  }
 </style>
 </head>
 <body>
   <img id="randomImage" src="" alt="รูปภาพสุ่ม">
+  <button id="randomButton" onclick="randomImage()">สุ่มรูปภาพ</button>
+  <button id="resetButton" onclick="resetPage()">รีเซ็ต</button>
 
   <script>
     const images = [];
@@ -31,11 +38,44 @@
 
     function randomImage() {
       const randomIndex = Math.floor(Math.random() * images.length);
-      document.getElementById("randomImage").src = images[randomIndex];
-      document.getElementById("randomButton").disabled = true; // ปิดการใช้งานปุ่มหลังจากกด
+      const randomImageSrc = images[randomIndex];
+      document.getElementById("randomImage").src = randomImageSrc;
+
+      // บันทึกรูปภาพล่าสุดใน localStorage
+      localStorage.setItem('lastImage', randomImageSrc);
+
+      // เพิ่มจำนวนครั้งที่กด
+      let clickCount = parseInt(localStorage.getItem('clickCount')) || 0;
+      clickCount++;
+      localStorage.setItem('clickCount', clickCount);
+
+      // ปิดการใช้งานปุ่มหากกดครบ 3 ครั้ง
+      if (clickCount >= 5) {
+        document.getElementById("randomButton").disabled = true;
+      }
     }
 
-    randomImage(); // สุ่มรูปภาพเมื่อโหลดหน้าเว็บครั้งแรก
+    function initializePage() {
+      // ตรวจสอบจำนวนครั้งที่กดและล็อคปุ่มถ้ากดครบ 3 ครั้ง
+      const clickCount = parseInt(localStorage.getItem('clickCount')) || 0;
+      const lastImage = localStorage.getItem('lastImage');
+
+      if (clickCount >= 5) {
+        document.getElementById("randomButton").disabled = true;
+      }
+
+      if (lastImage) {
+        // แสดงรูปภาพล่าสุดหากมีอยู่ใน localStorage
+        document.getElementById("randomImage").src = lastImage;
+      } else {
+        // สุ่มรูปภาพเมื่อโหลดหน้าเว็บครั้งแรก
+        randomImage();
+      }
+    }
+
+
+    // ตรวจสอบและเริ่มต้นสถานะเมื่อโหลดหน้าเว็บ
+    initializePage();
   </script>
 </body>
 </html>
